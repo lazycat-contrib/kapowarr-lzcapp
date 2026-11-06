@@ -1,0 +1,50 @@
+application:
+  subdomain: kapowarr
+  multi_instance: false
+  # Kapowarr ships with authentication disabled by default (settings
+  # auth_username / auth_password are empty). We do not open public_path, so the
+  # platform login gate stays in front of the whole app.
+  upstreams:
+    - location: /package-licenses/
+      backend: file:///lzcapp/pkg/content/licenses/
+    - location: /
+      backend: http://kapowarr:5656/
+
+services:
+  kapowarr:
+    # upstream: mrcas/kapowarr:v1.3.2
+    image: docker.1ms.run/mrcas/kapowarr:v1.3.2
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+    binds:
+      - /lzcapp/var/db:/app/db
+      - /lzcapp/var/comics:/comics
+      - /lzcapp/var/temp_downloads:/app/temp_downloads
+
+usage: |
+  Kapowarr 是漫画库管理器：从 ComicVine 拉取系列、卷、期元数据，
+  自动匹配本地已有的漫画文件，追踪更新并可从网盘/种子下载源抓取，
+  最后按命名规则打包成 CBZ。
+
+  使用方法：
+  1. 打开应用即可直接进入（本应用默认没有登录口令）。
+     因此它只通过懒猫的应用入口访问，没有对外开放公网地址。
+  2. 先用「Add Root Folder」把 /comics 加为漫画库根目录，
+     之后 Kapowarr 会扫描该目录并按 ComicVine 匹配已有文件。
+  3. 在 Settings 里填 ComicVine API key（免费注册 comicvine.gamespot.com 获取），
+     再配置下载客户端或直接使用内置的 DDL / GetComics 下载源。
+  4. 想让 Kapowarr 只能自己访问的话，可以在 Settings 里设置用户名和密码，
+     设好后再次打开就会要求登录。
+
+  数据与安全：
+  - 数据库在 /lzcapp/var/db（SQLite），漫画库在 /lzcapp/var/comics，
+    下载临时目录 /lzcapp/var/temp_downloads，三者随应用持久化。
+  - 上传到漫画库的 CBZ 就是最终文件本身，卸载应用会连带删除，
+    重要漫画请另行备份。
+  - 未使用 public_path：Kapowarr 默认无账号体系，直接对外开放等于不设防，
+    所以保留平台入口鉴权。若你自行在应用内设置了密码，也不会因此自动对外。
+
+  说明：
+  - 未做实机验证：扫描漫画库、ComicVine 匹配、下载与打包均未在设备上实测。

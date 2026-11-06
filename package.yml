@@ -1,0 +1,18 @@
+package: community.lazycat.app.kapowarr
+name: Kapowarr
+version: 0.0.0
+description: "Comic library manager: ComicVine metadata, volume tracking, downloads and CBZ packing."
+min_os_version: "1.5.0"
+homepage: https://github.com/Casvt/Kapowarr
+author: Casvt
+license: GPL-3.0
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: Kapowarr
+    description: "漫画库管理器：自动匹配 ComicVine 元数据、追更、下载并打包成 CBZ。"
+  en:
+    name: Kapowarr
+    description: "Comic library manager: ComicVine metadata, volume tracking, downloads and CBZ packing."
